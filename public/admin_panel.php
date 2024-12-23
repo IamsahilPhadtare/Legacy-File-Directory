@@ -84,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_username'])) {
                         <th>ID</th>
                         <th>Username</th>
                         <th>Clearance Level</th>
+                        <th>Last Login</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -95,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_username'])) {
                         echo "<td>" . htmlspecialchars($user['id']) . "</td>";
                         echo "<td>" . htmlspecialchars($user['username']) . "</td>";
                         echo "<td>" . htmlspecialchars($user['clearance_level']) . "</td>";
+                        echo "<td>" . htmlspecialchars($user['last_login']) . "</td>";
                         echo "<td>
                                 <form method='post' action='admin_panel.php' onsubmit=\"return confirm('Are you sure you want to remove this user?');\">
                                     <input type='hidden' name='remove_user_id' value='" . htmlspecialchars($user['id']) . "'>

@@ -33,6 +33,10 @@ mysqli_query($conn, $sql);
 $sql = "ALTER TABLE users ADD COLUMN IF NOT EXISTS clearance_level ENUM('read', 'upload', 'edit') DEFAULT 'read'";
 mysqli_query($conn, $sql);
 
+// Add last_login column to users table
+$sql = "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP NULL DEFAULT NULL";
+mysqli_query($conn, $sql);
+
 // Add default admin user
 $admin_username = "admin";
 $admin_password = password_hash("admin123", PASSWORD_DEFAULT);

@@ -49,7 +49,7 @@ function get_total_users() {
 
 function get_all_users() {
     global $conn;
-    $sql = "SELECT id, username, clearance_level FROM users WHERE is_admin = 0";
+    $sql = "SELECT id, username, clearance_level, last_login FROM users WHERE is_admin = 0";
     $result = mysqli_query($conn, $sql);
     $users = [];
     while($row = mysqli_fetch_assoc($result)){
