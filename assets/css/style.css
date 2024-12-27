@@ -1,3 +1,4 @@
+/* Core styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -5,45 +6,73 @@ body {
     background: #f4f4f4;
 }
 
-.login-container, .dashboard-container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
+/* Layout containers */
+.login-container, .dashboard-container, .admin-panel-container {
     background: white;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin: 20px auto;
 }
 
-.login-container {
-    max-width: 400px;
-    margin: 100px auto;
-}
+.login-container { max-width: 400px; margin: 100px auto; }
+.dashboard-container { max-width: 1200px; }
 
-nav {
+/* Navigation */
+nav, .admin-nav {
     display: flex;
     justify-content: space-between;
     padding: 10px;
-    background: #f8f9fa;
     margin-bottom: 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
 }
 
-nav div a {
-    margin-left: 15px;
-    color: #007bff;
+/* Common components */
+.btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
     text-decoration: none;
+    color: white;
 }
 
-nav div a:hover {
-    text-decoration: underline;
-}
+/* Button variants */
+.btn-primary { background: #007bff; }
+.btn-danger { background: #dc3545; }
+.btn-secondary { background: #6c757d; }
+.btn-success { background: #28a745; }
 
-.form-group {
-    margin-bottom: 15px;
-}
+.btn-primary:hover { background: #0056b3; }
+.btn-danger:hover { background: #c82333; }
+.btn-secondary:hover { background: #5a6268; }
+.btn-success:hover { background: #218838; }
 
-.form-group input {
+/* Tables */
+.admin-user-table, .file-list {
     width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-user-table th, 
+.admin-user-table td,
+.file-list th,
+.file-list td {
     padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.admin-user-table th { background: #f2f2f2; }
+.admin-user-table tr:nth-child(even) { background: #f9f9f9; }
+
+/* Forms */
+.form-group { margin-bottom: 15px; }
+
+input, select {
+    width: 100%;
+    padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
@@ -53,255 +82,68 @@ label {
     display: flex;
     align-items: center;
     gap: 5px;
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
-input[type="checkbox"] {
-    width: auto;
+/* Messages */
+.error-message, .success-message {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    text-align: center;
 }
 
-.file-upload-section {
-    padding: 20px;
+.error-message { background: #f8d7da; color: #721c24; }
+.success-message { background: #d4edda; color: #155724; }
+
+/* Sections */
+.online-users-section,
+.file-upload-section,
+.add-user-section,
+.manage-users-section,
+.manage-files-section {
+    padding: 15px;
+    margin: 20px 0;
     background: #f8f9fa;
     border-radius: 5px;
-    margin-bottom: 20px;
 }
 
-.file-list {
-    width: 100%;
-    border-collapse: collapse;
+/* Online users */
+.online-users-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
 }
 
-.file-list th, .file-list td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-.error-message {
-    color: #721c24;
-    background-color: #f8d7da;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 4px;
-    text-align: center;
-}
-
-.success-message {
-    color: #155724;
-    background-color: #d4edda;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 4px;
-    text-align: center;
-}
-
-.actions-form {
-    display: flex;
-    gap: 10px;
-}
-
-.actions-form select {
-    padding: 5px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-}
-
-.actions-form button {
-    padding: 5px 10px;
-    background: #dc3545; /* Red for delete */
+.admin-badge {
+    background: #007bff;
     color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    margin-left: 5px;
 }
 
-.actions-form button[name="update_clearance"] {
-    background: #28a745; /* Green for update */
-}
-
-.actions-form button:hover {
-    opacity: 0.8;
-}
-
-.btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-}
-
-.btn-success {
-    background-color: #28a745;
-    color: white;
-}
-
-.btn-success:hover {
-    background-color: #218838;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.btn-danger:hover {
-    background-color: #c82333;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-
-.clearance-select {
-    padding: 5px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-}
-
-/* Admin Panel Styles */
-
-.admin-panel-container {
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
+/* Admin specific */
 .admin-title {
     text-align: center;
-    color: #333333;
+    color: #333;
     margin-bottom: 20px;
 }
 
 .total-users {
     text-align: center;
     font-size: 1.2em;
-    color: #555555;
+    color: #555;
     margin-bottom: 30px;
 }
 
-.add-user-section, .manage-users-section {
-    margin-bottom: 40px;
-}
+/* Login toggle */
+.user-login-form,
+.admin-login-form { display: none; }
 
-.add-user-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.add-user-form input[type="text"],
-.add-user-form input[type="password"],
-.add-user-form select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.admin-user-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.admin-user-table th, .admin-user-table td {
-    padding: 12px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-.admin-user-table th {
-    background-color: #f2f2f2;
-}
-
-.admin-user-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.admin-user-table a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.admin-user-table a:hover {
-    text-decoration: underline;
-}
-
-.action-form {
-    display: flex;
-    gap: 10px;
-}
-
-/* Manage Files Section Styles */
-
-.manage-files-section {
-    margin-bottom: 40px;
-}
-
-.manage-files-section h2 {
-    margin-bottom: 20px;
-    color: #333333;
-}
-
-/* Initially hide both login forms */
-.user-login-form, .admin-login-form {
-    display: none;
-}
-
-/* Style for the toggle button */
 #toggle-button {
-    background-color: #007bff;
+    background: #007bff;
     color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
     margin-bottom: 20px;
-}
-
-#toggle-button:hover {
-    background-color: #0056b3;
-}
-
-/* Admin Navigation Styles */
-
-.admin-nav {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 20px;
-    padding: 10px 0;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.admin-nav .btn {
-    margin-right: 10px;
 }

@@ -3,6 +3,7 @@ session_start();
 require_once "../config/database.php";
 require_once "../includes/functions.php";
 check_login();
+update_user_activity();
 
 if (!$_SESSION["is_admin"]) {
     // Redirect non-admin users
@@ -36,21 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_username'])) {
 <head>
     <title>Admin Panel - LFD</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <script>
-        // Removed the unload event listener to prevent unwanted logout
-        /* 
-        window.addEventListener('unload', function () {
-            navigator.sendBeacon('../auth/logout.php');
-        });
-        */
-    </script>
+    <!-- Remove the automatic logout script -->
 </head>
 <body>
     <div class="admin-panel-container">
-        <!-- Add navigation buttons -->
+        <!-- Update navigation buttons -->
         <div class="admin-nav">
-            <a href="user_management.php" class="btn btn-secondary">Back to User Management</a>
-            <a href="dashboard.php" class="btn btn-secondary">Return to Main Page</a>
+            <a href="dashboard.php" class="btn btn-secondary">Dashboard</a>
+            <a href="file_management.php" class="btn btn-secondary">File Management</a>
+            <a href="../auth/logout.php" class="btn btn-danger">Logout</a>
         </div>
 
         <h1 class="admin-title">Admin Panel</h1>
@@ -96,8 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_username'])) {
                         echo "<td>" . htmlspecialchars($user['id']) . "</td>";
                         echo "<td>" . htmlspecialchars($user['username']) . "</td>";
                         echo "<td>" . htmlspecialchars($user['clearance_level']) . "</td>";
-                        echo "<td>" . htmlspecialchars($user['last_login']) . "</td>";
+                        echo "<td>" . htmlspecialchars($user['last_login'] ?? 'Never') . "</td>";
                         echo "<td>
+                                <button onclick=\"openClearanceModal(" . htmlspecialchars($user['id']) . ", '" . htmlspecialchars($user['username']) . "')\" class='btn btn-secondary'>Change Clearance</button>
                                 <form method='post' action='admin_panel.php' onsubmit=\"return confirm('Are you sure you want to remove this user?');\">
                                     <input type='hidden' name='remove_user_id' value='" . htmlspecialchars($user['id']) . "'>
                                     <input type='submit' value='Remove' class='btn btn-danger'>
@@ -109,8 +105,162 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_username'])) {
                 </tbody>
             </table>
         </section>
+
+        <!-- Clearance Change Modal -->
+        <div id="clearanceModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h3>Change Clearance Level</h3>
+                <p>User: <span id="modalUsername"></span></p>
+                <form id="clearanceForm" method="post" action="update_clearance.php">
+                    <input type="hidden" id="userId" name="user_id">
+                    <div class="form-group">
+                        <label for="newClearance">New Clearance Level:</label>
+                        <select id="newClearance" name="new_clearance" required>
+                            <option value="1">Level 1 (Basic)</option>
+                            <option value="2">Level 2 (Moderate)</option>
+                            <option value="3">Level 3 (High)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Admin Password:</label>
+                        <input type="password" id="adminPassword" name="admin_password" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Update Clearance</button>
+                        <button type="button" onclick="closeClearanceModal()" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 400px;
+        }
+        </style>
+
+        <script>
+        function openClearanceModal(userId, username) {
+            document.getElementById('clearanceModal').style.display = 'flex';
+            document.getElementById('modalUsername').textContent = username;
+            document.getElementById('userId').value = userId;
+        }
+
+        function closeClearanceModal() {
+            document.getElementById('clearanceModal').style.display = 'none';
+        }
+        </script>
+
+        <section class="online-users-section">
+            <h2>Online Users</h2>
+            <div class="online-users-list">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </section>
+
+        <style>
+        .online-users-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .online-users-list {
+            margin-top: 10px;
+        }
+        .online-users-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .online-users-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .last-active {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .admin-badge {
+            background-color: #007bff;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        </style>
+
+        <script>
+        const evtSource = new EventSource('stream_online_users.php');
+        let lastData = '';
         
-        <!-- ...existing code... -->
+        evtSource.onmessage = function(event) {
+            // Only update DOM if data has changed
+            if (lastData !== event.data) {
+                const users = JSON.parse(event.data);
+                const usersList = document.querySelector('.online-users-list');
+                
+                if (users.length === 0) {
+                    usersList.innerHTML = "<p>No users currently online</p>";
+                } else {
+                    let html = "<ul>";
+                    users.forEach(user => {
+                        const isAdmin = parseInt(user.is_admin) === 1;
+                        const adminBadge = isAdmin ? ' <span class="admin-badge">Admin</span>' : '';
+                        const activeClass = user.last_active === 'active now' ? ' class="user-active"' : '';
+                        html += `<li${activeClass}>
+                            ${escapeHtml(user.username)}${adminBadge}
+                            <span class="last-active">(${user.last_active})</span>
+                        </li>`;
+                    });
+                    html += "</ul>";
+                    usersList.innerHTML = html;
+                }
+                lastData = event.data;
+            }
+        };
+        
+        // Reconnect if connection is lost
+        evtSource.onerror = function() {
+            evtSource.close();
+            setTimeout(() => {
+                evtSource = new EventSource('stream_online_users.php');
+            }, 1000);
+        };
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+        </script>
+
+        <style>
+        /* Add this to your existing styles */
+        .user-active {
+            background: #e8f5e9;
+            border-left: 3px solid #28a745;
+            padding-left: 5px !important;
+        }
+        </style>
     </div>
 </body>
 </html>

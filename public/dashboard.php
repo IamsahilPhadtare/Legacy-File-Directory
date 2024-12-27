@@ -3,6 +3,7 @@ session_start();
 require_once "../config/database.php";
 require_once "../includes/functions.php";
 check_login();
+update_user_activity(); // Add this line
 
 if($_SESSION["is_admin"]) {
     $totalUsers = get_total_users();
@@ -27,14 +28,12 @@ if($_SESSION["is_admin"]) {
         <nav>
             <span>Welcome, <?php echo htmlspecialchars($_SESSION["username"]); ?>
                   <?php echo $_SESSION["is_admin"] ? " (Administrator)" : ""; ?></span>
-            <div>
+            <div class="nav-buttons">
                 <?php if($_SESSION["is_admin"]): ?>
-                    <a href="admin_panel.php">User Management</a>
-                    <a href="file_management.php">File Management</a>
-                <?php else: ?>
-                    <a href="dashboard.php">Dashboard</a>
+                    <a href="admin_panel.php" class="btn btn-secondary">User Management</a>
+                    <a href="file_management.php" class="btn btn-secondary">File Management</a>
                 <?php endif; ?>
-                <a href="../auth/logout.php">Logout</a>
+                <a href="../auth/logout.php" class="btn btn-danger">Logout</a>
             </div>
         </nav>
         <?php if($_SESSION["is_admin"]): ?>

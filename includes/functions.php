@@ -49,10 +49,15 @@ function get_total_users() {
 
 function get_all_users() {
     global $conn;
-    $sql = "SELECT id, username, clearance_level, last_login FROM users WHERE is_admin = 0";
+    $sql = "SELECT id, username, clearance_level, last_login, last_activity 
+            FROM users 
+            WHERE is_admin = 0 
+            ORDER BY username ASC";
     $result = mysqli_query($conn, $sql);
     $users = [];
     while($row = mysqli_fetch_assoc($result)){
+        // Format last_login to be display-friendly
+        $row['last_login'] = $row['last_login'] ? date('Y-m-d H:i:s', strtotime($row['last_login'])) : 'Never';
         $users[] = $row;
     }
     return $users;
@@ -154,5 +159,34 @@ function start_secure_session() {
     session_name($session_name);
     session_start();
     session_regenerate_id(true); // Regenerate session ID to prevent fixation
+}
+
+function update_user_activity() {
+    global $conn;
+    if(isset($_SESSION['id'])) {
+        // Use a more efficient query with ON DUPLICATE KEY UPDATE
+        $sql = "INSERT INTO user_activity (user_id, last_activity) 
+                VALUES (?, CURRENT_TIMESTAMP(3))
+                ON DUPLICATE KEY UPDATE last_activity = CURRENT_TIMESTAMP(3)";
+        if($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, "i", $_SESSION['id']);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
+        }
+    }
+}
+
+function get_online_users() {
+    global $conn;
+    // Join with user_activity table for better performance
+    $sql = "SELECT u.id, u.username, CAST(u.is_admin AS SIGNED) as is_admin, 
+            ua.last_activity
+            FROM users u
+            JOIN user_activity ua ON u.id = ua.user_id
+            WHERE ua.last_activity > NOW() - INTERVAL 30 SECOND
+            ORDER BY ua.last_activity DESC, u.username ASC";
+    
+    $result = mysqli_query($conn, $sql);
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 ?>

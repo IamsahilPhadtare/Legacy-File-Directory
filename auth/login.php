@@ -34,8 +34,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                         $_SESSION["username"] = $username;
                         $_SESSION["is_admin"] = ($login_type == "admin") ? 1 : 0;
                         
-                        // Update last_login timestamp
-                        $update_sql = "UPDATE users SET last_login = NOW() WHERE id = ?";
+                        // Update last_login and last_activity timestamps
+                        $update_sql = "UPDATE users SET last_login = NOW(), last_activity = NOW() WHERE id = ?";
                         if($update_stmt = mysqli_prepare($conn, $update_sql)) {
                             mysqli_stmt_bind_param($update_stmt, "i", $id);
                             mysqli_stmt_execute($update_stmt);
